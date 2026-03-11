@@ -28,13 +28,17 @@ def task1_2results():
         print("No valid path found within energy budget")
 
 def task1_3results():
-    distance, path, energy = astar_energy(G, Dist, Cost, Coord, S, T, B)
-    path_str = "->".join(["S"] + path[1:-1] + ["T"])
+    result = astar_energy(G, Dist, Cost, Coord, S, T, B)
     print("── Task 1.3 ──")
+    if result[0] == float('inf'):
+        print("No valid path found within energy budget")
+        return
+    distance, path, energy = result
+    path_str = "->".join(["S"] + path[1:-1] + ["T"])
     print(f"Shortest path:     {path_str}")
     print(f"Shortest distance: {distance}")
     print(f"Total energy:      {energy}")
-
+    
 task1_1results()
 
 task1_2results()
