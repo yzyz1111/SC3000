@@ -1,3 +1,4 @@
+
 import json 
 import math
 import heapq
@@ -65,4 +66,3 @@ distance, path = astar(G, Dist, Coord, source, target)
 path_str = "->".join(["S"] + path[1:-1] + ["T"])
 print(f"Shortest path: {path_str}")
 print(f"Shortest distance: {distance}")
-
