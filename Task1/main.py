@@ -1,4 +1,4 @@
-from utils import astar, load_data, heuristic, reconstruct_path, task1_2
+from utils import astar, load_data, heuristic, reconstruct_path, task1_2, astar_energy
 G, Coord, Dist, Cost = load_data()
 
 S = '1'
@@ -27,6 +27,16 @@ def task1_2results():
     else:
         print("No valid path found within energy budget")
 
+def task1_3results():
+    distance, path, energy = astar_energy(G, Dist, Cost, Coord, S, T, B)
+    path_str = "->".join(["S"] + path[1:-1] + ["T"])
+    print("── Task 1.3 ──")
+    print(f"Shortest path:     {path_str}")
+    print(f"Shortest distance: {distance}")
+    print(f"Total energy:      {energy}")
+
 task1_1results()
 
 task1_2results()
+
+task1_3results()

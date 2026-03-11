@@ -52,6 +52,35 @@ def astar(G, Dist, Coord, source, target):
 
     return float('inf'), []
 
+def astar_energy(G, Dist, Cost, Coord, source, target, budget):
+    pq = [(0, 0, 0, source)]   # (f, g, energy, node)
+    g_score = {source: 0}
+    best_energy = {source: 0}
+    prev = {source: None}
+    visited = set()
+
+    while pq:
+        f, g, energy, v = heapq.heappop(pq)
+
+        if (v, energy) in visited:
+            continue
+        visited.add((v, energy))
+
+        if v == target:
+            return g, reconstruct_path(prev, target), energy
+        
+        for w in G[v]:
+            new_g = g + Dist[f"{v},{w}"]
+            new_energy = energy + Cost[f"{v},{w}"]
+
+            if new_energy <= budget and (w not in best_energy or new_energy < best_energy[w]):
+                best_energy[w] = new_energy
+                prev[w] = v
+                new_f = new_g + heuristic(Coord, w, target)
+                heapq.heappush(pq, (new_f, new_g, new_energy, w))
+
+    return float('inf'), [], 0
+
 # ── Task 1.2: UCS with Energy Constraint ─────────────────
 def task1_2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, int, int]:
     pq = [(0, 0, source, [])]
