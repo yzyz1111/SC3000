@@ -56,12 +56,13 @@ def astar_energy(G, Dist, Cost, Coord, source, target, budget):
     pq = [(0, 0, 0, source)]
     best = {}
     prev = {source: None}
+    expanded = 0              # add this
 
     while pq:
         f, g, energy, v = heapq.heappop(pq)
 
         if v == target:
-            return g, reconstruct_path(prev, target), energy
+            return g, reconstruct_path(prev, target), energy, expanded  # return it
 
         if v in best:
             best_g, best_e = best[v]
@@ -69,6 +70,7 @@ def astar_energy(G, Dist, Cost, Coord, source, target, budget):
                 continue
 
         best[v] = (g, energy)
+        expanded += 1         # increment here
 
         for w in G[v]:
             new_g = g + Dist[f"{v},{w}"]
@@ -79,7 +81,7 @@ def astar_energy(G, Dist, Cost, Coord, source, target, budget):
                     prev[w] = v   # only update prev if better distance
                 heapq.heappush(pq, (new_f, new_g, new_energy, w))
 
-    return float('inf'), [], 0
+    return float('inf'), [], 0, 0
 
 # ── Task 1.2: UCS with Energy Constraint ─────────────────
 def task1_2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, int, int]:
