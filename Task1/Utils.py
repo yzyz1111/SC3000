@@ -9,7 +9,7 @@ T = '50'
 B = 287932
 
 
-def load_Data():
+def load_data():
     with open('Data/G.json') as f: G = json.load(f)
     with open('Data/Coord.json') as f: Coord = json.load(f)
     with open('Data/Dist.json') as f: Dist = json.load(f)
