@@ -14,18 +14,10 @@ def load_dict(file: str) -> dict:
         return json.load(json_file)
 
 def task2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, int, int]:
-    """
-    UCS to find shortest distance path from source to target
-    with energy cost <= budget
-
-    Returns:
-        tuple: (path, total_distance, expanded, total_energy)
-    """
     
-    # (total_distance, total_energy, node, path)  -- energy as tiebreaker
+    # (total_distance, total_energy, node, path)
     pq = [(0, 0, source, [])]
     
-    # node -> minimum energy used to reach it
     energy_cost = {source: 0}
     
     expanded = 0
@@ -52,10 +44,10 @@ def task2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, int,
 
 
 # Load dictionaries
-G     = load_dict('G.json')
-Coord = load_dict('Coord.json')
-Dist  = load_dict('Dist.json')
-Cost  = load_dict('Cost.json')
+G     = load_dict('Data/G.json')
+Coord = load_dict('Data/Coord.json')
+Dist  = load_dict('Data/Dist.json')
+Cost  = load_dict('Data/Cost.json')
 
 # Run Task 2
 result = task2(G, Dist, Cost, S, T, B)
@@ -63,7 +55,7 @@ result = task2(G, Dist, Cost, S, T, B)
 if result:
     path, shortest_dist, expanded, total_energy = result
     print(f"Path:           {path}")
-    print(f"Shortest Dist:  {shortest_dist}")
+    print(f"Shortest distance:  {shortest_dist}")
     print(f"Expanded Nodes: {expanded}")
     print(f"Total Energy:   {total_energy}")
 else:

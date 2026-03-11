@@ -16,7 +16,7 @@ def load_dict(file: str) -> dict:
     with open(file) as f:
         return json.load(f)
 
-def load_Data():
+def load_data():
     G     = load_dict('Data/G.json')
     Coord = load_dict('Data/Coord.json')
     Dist  = load_dict('Data/Dist.json')
@@ -59,29 +59,9 @@ def astar(G, Dist, Coord, source, target):
 
     return float('inf'), []
 
-# ── Task 1.2: UCS with Energy Constraint ─────────────────
-def task1_2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, int, int]:
-    pq = [(0, 0, source, [])]
-    energy_cost = {source: 0}
-    expanded = 0
-
-    while pq:
-        node_distance, node_energy, current_node, path = heapq.heappop(pq)
-        expanded += 1
-        if current_node == target:
-            return (path + [current_node], node_distance, expanded, node_energy)
-        for neighbor in G[current_node]:
-            new_dist   = node_distance + Dist[f"{current_node},{neighbor}"]
-            new_energy = node_energy   + Cost[f"{current_node},{neighbor}"]
-            if new_energy <= budget and (neighbor not in energy_cost or new_energy < energy_cost[neighbor]):
-                heapq.heappush(pq, (new_dist, new_energy, neighbor, path + [current_node]))
-                energy_cost[neighbor] = new_energy
-
-    return None
-
 # ── Main ──────────────────────────────────────────────────
 if __name__ == "__main__":
-    G, Coord, Dist, Cost = load_Data()
+    G, Coord, Dist, Cost = load_data()
 
     # Task 1.1
     distance, path = astar(G, Dist, Coord, S, T)
