@@ -191,6 +191,7 @@ for y in range(GRID_SIZE-1, -1, -1):
         else:
             row += f" {policy_ql[(x,y)]}  "
     print(row)
+    
 def get_transition_probs(state, action):
     if state == GOAL:
         return [(GOAL, 1.0)]
