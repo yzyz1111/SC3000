@@ -27,8 +27,8 @@ GAMMA = 0.9
 STEP_REWARD = -1.0
 GOAL_REWARD = 10.0
 
+# returns list of all valid states
 def get_all_states():
-    """Return list of all valid (non-roadblock) states."""
     states = []
     for x in range(GRID_SIZE):
         for y in range(GRID_SIZE):
@@ -36,35 +36,24 @@ def get_all_states():
                 states.append((x, y))
     return states
 
-
+# returns new state after moving in the given direction, or same state if hitting wall/roadblock
 def move(state, action):
-    """
-    Attempt to move from state in the given direction.
-    Returns new state, or same state if hitting wall/roadblock.
-    """
     dx, dy = ACTION_MAP[action]
     nx, ny = state[0] + dx, state[1] + dy
     if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE and (nx, ny) not in ROADBLOCKS:
         return (nx, ny)
     return state
 
-
+# -1 per step, +10 if reaching goal, 0 if already at goal
 def get_reward(state, next_state):
-    """
-    -1 per step. +10 if reaching goal (net +9).
-    0 if already at goal (terminal).
-    """
     if state == GOAL:
         return 0.0
     if next_state == GOAL:
         return STEP_REWARD + GOAL_REWARD  # -1 + 10 = +9
     return STEP_REWARD
 
+# intended action may not always be executed as planned.
 def stochastic_transition(state, action):
-    """
-    Simulate one step in the environment.
-    Agent calls this as a black box — doesn't see the probabilities.
-    """
     if action == "U":
         transitions = [("U", 0.8), ("L", 0.1), ("R", 0.1)]
     elif action == "D":
