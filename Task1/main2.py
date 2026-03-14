@@ -191,3 +191,197 @@ for y in range(GRID_SIZE-1, -1, -1):
         else:
             row += f" {policy_ql[(x,y)]}  "
     print(row)
+def get_transition_probs(state, action):
+    if state == GOAL:
+        return [(GOAL, 1.0)]
+
+    if action == "U":
+        outcomes = [("U", 0.8), ("L", 0.1), ("R", 0.1)]
+    elif action == "D":
+        outcomes = [("D", 0.8), ("L", 0.1), ("R", 0.1)]
+    elif action == "L":
+        outcomes = [("L", 0.8), ("U", 0.1), ("D", 0.1)]
+    elif action == "R":
+        outcomes = [("R", 0.8), ("U", 0.1), ("D", 0.1)]
+
+    # Aggregate — multiple outcomes can land on same state
+    trans = {}
+    for a, p in outcomes:
+        ns = move(state, a)
+        trans[ns] = trans.get(ns, 0.0) + p
+
+    return list(trans.items())
+
+def value_iteration(theta=1e-8):
+    states = get_all_states()
+    
+    # Step 1: Initialize all values to 0
+    V = {s: 0.0 for s in states}
+    
+    iterations = 0
+    
+    # Step 2: Loop until convergence
+    while True:
+        delta = 0.0
+        
+        for s in states:
+            # Goal is terminal — value stays 0
+            if s == GOAL:
+                continue
+            
+            old_v = V[s]
+            
+            # Try all 4 actions, keep the best
+            best_val = float('-inf')
+            for a in ACTIONS:
+                # Compute Q(s, a)
+                q_val = 0.0
+                for next_state, prob in get_transition_probs(s, a):
+                    r = get_reward(s, next_state)
+                    q_val += prob * (r + GAMMA * V[next_state])
+                best_val = max(best_val, q_val)
+            
+            # Update V(s) with the best action's value
+            V[s] = best_val
+            delta = max(delta, abs(V[s] - old_v))
+        
+        iterations += 1
+        
+        if delta < theta:
+            break
+    
+    # Step 3: Extract the optimal policy
+    policy = {}
+    for s in states:
+        if s == GOAL:
+            policy[s] = "G"
+            continue
+        
+        best_action = None
+        best_val = float('-inf')
+        for a in ACTIONS:
+            q_val = 0.0
+            for next_state, prob in get_transition_probs(s, a):
+                r = get_reward(s, next_state)
+                q_val += prob * (r + GAMMA * V[next_state])
+            if q_val > best_val:
+                best_val = q_val
+                best_action = a
+        policy[s] = best_action
+    
+    return V, policy, iterations
+
+ARROW = {"U": "↑", "D": "↓", "L": "←", "R": "→", "G": "★"}
+
+def print_results(V, policy, iters, title):
+    print(f"\n{'='*50}")
+    print(f" {title} — Converged in {iters} iterations")
+    print(f"{'='*50}")
+    
+    # Value Function
+    print("\n Optimal Value Function:")
+    print("   " + "".join(f"  x={x}   " for x in range(GRID_SIZE)))
+    for y in range(GRID_SIZE - 1, -1, -1):
+        row = ""
+        for x in range(GRID_SIZE):
+            if (x, y) in ROADBLOCKS:
+                row += " BLOCK "
+            else:
+                row += f" {V[(x,y)]:6.2f} "
+        print(f"y={y} |{row}|")
+    
+    # Policy
+    print("\n Optimal Policy:")
+    print("   " + "".join(f"  x={x} " for x in range(GRID_SIZE)))
+    for y in range(GRID_SIZE - 1, -1, -1):
+        row = ""
+        for x in range(GRID_SIZE):
+            if (x, y) in ROADBLOCKS:
+                row += " BLK "
+            else:
+                row += f"  {ARROW[policy[(x,y)]]}  "
+        print(f"y={y} |{row}|")
+    
+    print(f"\n Value at Start {START}: {V[START]:.4f}")
+
+def policy_evaluation(policy, V, states, theta=1e-8):
+    """Given a fixed policy, compute its value function."""
+    while True:
+        delta = 0.0
+        for s in states:
+            if s == GOAL:
+                continue
+            
+            old_v = V[s]
+            
+            # Only evaluate the ONE action the policy says to take
+            a = policy[s]
+            val = 0.0
+            for next_state, prob in get_transition_probs(s, a):
+                r = get_reward(s, next_state)
+                val += prob * (r + GAMMA * V[next_state])
+            
+            V[s] = val
+            delta = max(delta, abs(V[s] - old_v))
+        
+        if delta < theta:
+            break
+    
+    return V
+
+
+def policy_improvement(V, states):
+    """Given a value function, pick the best action at every state."""
+    policy = {}
+    for s in states:
+        if s == GOAL:
+            policy[s] = "G"
+            continue
+        
+        best_action = None
+        best_val = float('-inf')
+        for a in ACTIONS:
+            q_val = 0.0
+            for next_state, prob in get_transition_probs(s, a):
+                r = get_reward(s, next_state)
+                q_val += prob * (r + GAMMA * V[next_state])
+            if q_val > best_val:
+                best_val = q_val
+                best_action = a
+        policy[s] = best_action
+    
+    return policy
+
+
+def policy_iteration():
+    states = get_all_states()
+    
+    # Step 1: Start with arbitrary policy (all Up)
+    policy = {s: "U" for s in states}
+    policy[GOAL] = "G"
+    V = {s: 0.0 for s in states}
+    
+    iterations = 0
+    
+    while True:
+        # Step 2: Evaluate current policy
+        V = policy_evaluation(policy, V, states)
+        
+        # Step 3: Improve policy greedily
+        new_policy = policy_improvement(V, states)
+        
+        iterations += 1
+        
+        # Step 4: If policy didn't change, we're done
+        if all(new_policy[s] == policy[s] for s in states):
+            break
+        
+        policy = new_policy
+    
+    return V, policy, iterations
+
+V_vi, policy_vi, iters_vi = value_iteration()
+print_results(V_vi, policy_vi, iters_vi, "Value Iteration")
+
+V_pi, policy_pi, iters_pi = policy_iteration()
+print_results(V_pi, policy_pi, iters_pi, "Policy Iteration")
