@@ -1,7 +1,7 @@
 import math
 import heapq
 
-# ── Task 1.1: A* Shortest Path ────────────────────────────
+#Task 1.1: A* Shortest Path
 def heuristic(Coord, v, target):
     x1, y1 = Coord[v]
     x2, y2 = Coord[target]
@@ -37,7 +37,7 @@ def astar(G, Dist, Coord, source, target):
 
     return float('inf'), []
 
-# ── Task 1.2: UCS with Energy Constraint ─────────────────
+# Task 1.2: UCS with Energy Constraint
 def task1_2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, int, int]:
     pq = [(0, 0, source, [])]
     energy_cost = {source: 0}
@@ -57,7 +57,7 @@ def task1_2(G, Dist, Cost, source, target, budget) -> tuple[list[str], float, in
 
     return None
 
-# ── Task 1.3: A* with Energy Constraint ─────────────────
+# Task 1.3: A* with Energy Constraint
 def astar_energy(G, Dist, Cost, Coord, source, target, budget):
     pq = [(0, 0, 0, source)]
     best = {}
