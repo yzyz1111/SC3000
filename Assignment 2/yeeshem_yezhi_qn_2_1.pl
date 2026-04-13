@@ -5,17 +5,17 @@ son(elizabeth, andrew, 3).
 son(elizabeth, edward, 4).
 daughter(elizabeth, ann, 2).
 
-% Relational rule: X precedes Y under old succession
-old_precedes(X, Y) :-
+% rules
+old_rule(X, Y) :-
     son(elizabeth, X, _),
     daughter(elizabeth, Y, _).
 
-old_precedes(X, Y) :-
+old_rule(X, Y) :-
     son(elizabeth, X, Bx),
     son(elizabeth, Y, By),
     Bx < By.
 
-old_precedes(X, Y) :-
+old_rule(X, Y) :-
     daughter(elizabeth, X, Bx),
     daughter(elizabeth, Y, By),
     Bx < By.
